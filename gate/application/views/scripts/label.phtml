@@ -1,0 +1,31 @@
+<?php $vo = $this->vo; /* @var $vo Vo_Label */ ?>
+<!--<div class="cfm-layer-element cfm-label" data-id="<?php echo $vo->id; ?>" data-x="<?php echo $vo->x; ?>" data-y="<?php echo $vo->y; ?>" >-->
+<div class="cfm-inner" <?php echo ($vo->type == 'icon' ? 'style="margin-top:-'.$vo->icon->height / 2 .'px;"' : ''); //move about a half ?>>
+	<div class="<?php echo $vo->type == 'text' ? 'cfm-title' : 'cfm-icon' ?>"> 
+    <?php 
+        if($vo->_linkRegionId || $vo->_linkMapId)
+        { 
+           $link = new stdClass(); //generate link object
+           $link->mapId = $vo->_linkMapId;
+           if ($vo->_linkRegionId)
+               $link->regionId = $vo->_linkRegionId;
+
+           if ($vo->_linkMapId && $vo->_linkRegionId)
+              $linkAttr = 'data-cfm-region-link=\'' . Zend_Json::encode($link) . '\'';
+           else 
+              $linkAttr = 'data-cfm-map-link="' . $vo->_linkMapId . '"';
+        ?>
+    	<a href="#" <?php echo $linkAttr; ?>>
+    <?php }  ?>
+	<?php 
+		   if($vo->type == 'text')
+		       echo nl2br($this->escape($vo->text)); //preserve new lines
+		    else
+		       echo '<img src="'. $vo->icon->url .'"/>';
+			   
+		if($vo->_linkRegionId || $vo->_linkMapId)
+			echo '</a>';
+	?>
+	</div>
+	</div>
+<!--</div>-->

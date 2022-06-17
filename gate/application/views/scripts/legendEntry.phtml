@@ -1,0 +1,7 @@
+<?php 
+	/* @var $vo Vo_MarkerType */ 
+    $vo = $this->vo; 
+    if (!$vo->showOnLegend)
+    	return;
+?>
+<li><div class="cfm-marker cfm-marker-<?php echo $vo->cssName;?>"></div>&nbsp;&nbsp;<?php echo $this->escape($vo->name);?></li>

@@ -1,0 +1,63 @@
+<?php 
+	/* @var $vo Vo_Marker */ 
+    $vo = $this->vo; 
+    $dictEntries = $this->partialLoop()->view->dictEntries; 
+    
+    $markerLink = new stdClass();
+    $markerLink->mapId = $vo->_mapId;
+    $markerLink->markerId = $vo->id;
+    $markerLink = Zend_Json::encode($markerLink);
+    
+    $iconObj = $vo->icon ? $vo->icon : $vo->_type->defaultIcon;
+    
+    $paramsNeeded = $vo->param1Value || $vo->param2Value || $vo->param3Value || $vo->param4Value || $vo->param5Value;
+?>
+<div class="search-result-row" >
+    <div class="controls" style="position: relative;" > 
+    	<a class="btn btn-mini" title="Show on map" rel="tooltip" data-cfm-marker-link='<?php echo $markerLink; ?>' href="#"><i class="icon-eye-open"></i></a> <br/>
+        <?php if ($paramsNeeded) : //show info button only if needed?> 
+    	<a class="btn btn-mini" title="Show details" rel="tooltip" data-cfm-marker-info="<?php echo $vo->id; ?>" href="#"><i class="icon-search"></i></a> 
+    	<?php endif; ?>
+    </div> 
+   <div class="icon" > 
+     <img src="<?php echo $iconObj->url; ?>" width="<?php echo $iconObj->width; ?>" height="<?php echo $iconObj->height; ?>" />
+   </div> 
+   <div class="texts" style="margin-left: <?php echo $iconObj->width ?>px;"> 
+    	<div class="cfm-title"><?php echo $this->escape($vo->title); ?></div> 
+    	<div><span class="cfm-param-label">Type:&nbsp;</span><?php echo $this->escape($vo->_type->name); ?></div>
+     <?php 
+        if ($paramsNeeded)
+        {
+            /* @var $paramVo Vo_MarkerTypeParam */
+            foreach ($vo->_type->params as $paramVo)
+            {
+                $num = $paramVo->number;
+                $varName = 'param' .$num . 'Value';
+                if (!$vo->$varName || !$paramVo->alwaysVisible) //no value for this param or not visible
+                    continue;
+                
+                echo '<div>';    
+                
+                if ($paramVo->type == 'longText')
+                {
+                	echo $this->longTextLink($vo->$varName, $paramVo->label);
+                }
+                else
+                {
+                   if ($paramVo->showLabel)
+                       echo '<span class="cfm-param-label">'. $this->escape($paramVo->label) .'</span>&nbsp;';
+                   
+                   if ($paramVo->type == 'text')
+                        echo $this->escape($vo->$varName);
+                   else if ($paramVo->type == 'dictionary') //get from dictionary
+                        echo $this->escape($dictEntries[$paramVo->typeValue][$vo->$varName]->value);
+                }
+                   
+                echo '</div>
+	'; 
+            }
+        }
+     ?>
+    <?php echo $this->partialLoop()->view->mapBreadcrumb($vo->map, false, true, $vo->region); ?>
+   </div>
+</div>
